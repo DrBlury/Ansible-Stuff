@@ -1,0 +1,52 @@
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.ssh.insert_key = false
+
+  config.vm.define "vagrant1" do |vagrant1|
+    vagrant1.vm.box = "ubuntu/trusty64"
+    vagrant1.vm.network "forwarded_port", guest: 80, host: 8083
+    vagrant1.vm.network "forwarded_port", guest: 443, host: 8448
+    vagrant1.vm.network "forwarded_port", guest: 2181, host: 2191
+    vagrant1.vm.network "forwarded_port", guest: 9092, host: 9081
+    vagrant1.vm.hostname = "kafka1"
+    vagrant1.vm.network :private_network, ip: "10.0.0.11"
+
+    vagrant1.vm.provider "virtualbox" do |v|
+      v.memory = 8192
+      v.cpus = 2
+    end
+  end
+
+  config.vm.define "vagrant2" do |vagrant2|
+    vagrant2.vm.box = "ubuntu/trusty64"
+    vagrant2.vm.network "forwarded_port", guest: 80, host: 8084
+    vagrant2.vm.network "forwarded_port", guest: 443, host: 8449
+    vagrant2.vm.network "forwarded_port", guest: 2181, host: 2192
+    vagrant2.vm.network "forwarded_port", guest: 9092, host: 9082
+    vagrant2.vm.hostname = "kafka2"
+    vagrant2.vm.network :private_network, ip: "10.0.0.12"
+
+    vagrant2.vm.provider "virtualbox" do |v|
+      v.memory = 8192
+      v.cpus = 2
+    end
+  end
+
+  config.vm.define "vagrant3" do |vagrant3|
+    vagrant3.vm.box = "ubuntu/trusty64"
+    vagrant3.vm.network "forwarded_port", guest: 80, host: 8085
+    vagrant3.vm.network "forwarded_port", guest: 443, host: 8450
+    vagrant3.vm.network "forwarded_port", guest: 2181, host: 2193
+    vagrant3.vm.network "forwarded_port", guest: 9092, host: 9083
+    vagrant3.vm.hostname = "kafka3"
+    vagrant3.vm.network :private_network, ip: "10.0.0.13"
+
+    vagrant3.vm.provider "virtualbox" do |v|
+      v.memory = 8192
+      v.cpus = 2
+    end
+  end
+
+  
+end
