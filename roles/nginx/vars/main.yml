@@ -1,0 +1,6 @@
+---
+# vars file for ./roles/nginx
+key_file: /etc/nginx/ssl/nginx.key
+cert_file: /etc/nginx/ssl/nginx.cert
+conf_file: /etc/nginx/sites-available/default
+server_name: localhost

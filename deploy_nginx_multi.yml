@@ -1,0 +1,8 @@
+- name: Configure webserver with Nginx and TLS
+  hosts: webservers
+  become: true
+  pre_tasks:
+    - name: Update apt cache
+      apt: update-cache=yes
+  roles:
+    - name: nginx

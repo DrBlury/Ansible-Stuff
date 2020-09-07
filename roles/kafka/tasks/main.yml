@@ -1,0 +1,71 @@
+---
+- name: Add OpenJDK Repository for apt
+  apt_repository:
+    repo: ppa:openjdk-r/ppa
+    state: present
+
+# tasks file for ./roles/kafka
+- name: Install OpenJDK 8
+  apt:
+    name: openjdk-8-jdk, unzip
+
+- name: Create Kafka folder
+  file:
+    path: /home/vagrant/Kafka
+    state: directory
+
+- name: Download and unpack Kafka Binary
+  unarchive: 
+    remote_src: yes
+    validate_certs: false
+    src: http://apache.lauf-forum.at/kafka/2.6.0/kafka_2.13-2.6.0.tgz
+    dest: /home/vagrant/Kafka
+    creates: /home/vagrant/Kafka/kafka_2.13-2.6.0/
+
+- name: Copy Zookeeper config
+  template: 
+    src: templates/zookeeper.properties
+    dest: /home/vagrant/Kafka/kafka_2.13-2.6.0/config/zookeeper.properties
+
+- name: Copy Kafka config
+  template: 
+    src: templates/server.properties
+    dest: /home/vagrant/Kafka/kafka_2.13-2.6.0/config/server.properties
+
+- name: Create target directory
+  file: path=/var/lib/zookeeper/ state=directory
+
+- name: Copy Zookeeper myid file
+  shell: echo {{zookeeper_broker_id}} > /var/lib/zookeeper/myid
+
+    
+- name: Open Zookeeper & SSH Ports
+  ufw:
+    rule: allow
+    port: '{{ item }}'
+    proto: tcp
+  loop:
+    - "{{ zookeeper_server_port }}"
+    - "{{ zookeeper_server_port_alternative }}"
+    - "{{ zookeeper_port }}"
+    - ssh
+
+- name: Enable UFW
+  ufw:
+    state: enabled
+    policy: allow
+
+- name: Copy hosts file
+  copy:
+    src: files/hosts
+    dest: /etc/hosts
+  
+
+- name: Give configuration finish message
+  shell: 
+    cmd: echo "Successfully downloaded and configured Kafka & Zookeeper!"
+  register: finish_message
+
+- debug: msg="{{ finish_message.stdout }}"
+
+
