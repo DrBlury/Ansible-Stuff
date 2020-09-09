@@ -1,0 +1,9 @@
+---
+# tasks file for ./roles/vault-docker
+- name: Enable Vault UI Port via UFW
+  ufw:
+    rule: allow
+    port: '{{ item }}'
+    proto: tcp
+  loop:
+    - "{{ vault_ui_port }}"

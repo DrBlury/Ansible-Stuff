@@ -4,7 +4,7 @@
   tasks:
     - name: Run Zookeeper
       shell: 
-        cmd: bash /home/vagrant/Kafka/kafka_2.13-2.6.0/bin/zookeeper-server-start.sh -daemon /home/vagrant/Kafka/kafka_2.13-2.6.0/config/zookeeper.properties
+        cmd: bash /opt/kafka/bin/zookeeper-server-start.sh -daemon /opt/kafka/config/zookeeper.properties
       register: zookeeper_answer
 
     - debug: msg="{{ zookeeper_answer }}"

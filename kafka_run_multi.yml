@@ -4,7 +4,7 @@
   tasks:
     - name: Run Kafka
       shell: 
-        cmd: bash /home/vagrant/Kafka/kafka_2.13-2.6.0/bin/kafka-server-start.sh -daemon /home/vagrant/Kafka/kafka_2.13-2.6.0/config/server.properties
+        cmd: bash /opt/kafka/bin/kafka-server-start.sh -daemon /opt/kafka/config/server.properties
       register: kafka_answer
 
     - debug: msg="{{ kafka_answer }}"

@@ -1,43 +1,43 @@
 ---
-- name: Add OpenJDK Repository for apt
-  apt_repository:
-    repo: ppa:openjdk-r/ppa
-    state: present
-
 # tasks file for ./roles/kafka
-- name: Install OpenJDK 8
+- name: Install unzip
   apt:
-    name: openjdk-8-jdk, unzip
+    name: unzip
 
 - name: Create Kafka folder
   file:
-    path: /home/vagrant/Kafka
+    path: "{{ kafka_destination_download }}"
     state: directory
 
 - name: Download and unpack Kafka Binary
   unarchive: 
     remote_src: yes
     validate_certs: false
-    src: http://apache.lauf-forum.at/kafka/2.6.0/kafka_2.13-2.6.0.tgz
-    dest: /home/vagrant/Kafka
-    creates: /home/vagrant/Kafka/kafka_2.13-2.6.0/
+    src: "{{ kafka_dl_link }}"
+    dest: "{{ kafka_destination_download }}"
+    creates: "{{ kafka_destination_download }}/{{ kafka_version }}/"
+
+- name: Create link for Kafka folder
+  file:
+    src: "{{ kafka_destination_download }}/{{ kafka_version }}"
+    dest: "{{ kafka_destination_final }}"
+    state: link
 
 - name: Copy Zookeeper config
   template: 
     src: templates/zookeeper.properties
-    dest: /home/vagrant/Kafka/kafka_2.13-2.6.0/config/zookeeper.properties
+    dest: "{{ kafka_destination_download }}/{{ kafka_version }}/config/zookeeper.properties"
 
 - name: Copy Kafka config
   template: 
     src: templates/server.properties
-    dest: /home/vagrant/Kafka/kafka_2.13-2.6.0/config/server.properties
+    dest: "{{ kafka_destination_download }}/{{ kafka_version }}/config/server.properties"
 
 - name: Create target directory
   file: path=/var/lib/zookeeper/ state=directory
 
 - name: Copy Zookeeper myid file
-  shell: echo {{zookeeper_broker_id}} > /var/lib/zookeeper/myid
-
+  shell: echo "{{zookeeper_broker_id}}" > /var/lib/zookeeper/myid
     
 - name: Open Zookeeper & SSH Ports
   ufw:
@@ -59,8 +59,16 @@
   copy:
     src: files/hosts
     dest: /etc/hosts
-  
 
+- name: Copy init.d file
+  copy:
+    src: files/kafka_zookeeper_init.d
+    dest: /etc/init.d/kafka
+    mode: 755
+
+- name: Create Kafka & Zookeeper Service
+  shell: update-rc.d kafka defaults
+  
 - name: Give configuration finish message
   shell: 
     cmd: echo "Successfully downloaded and configured Kafka & Zookeeper!"

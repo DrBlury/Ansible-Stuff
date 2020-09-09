@@ -1,0 +1,19 @@
+---
+# tasks file for ./roles/common
+- name: Add OpenJDK Repository for apt
+  apt_repository:
+    repo: ppa:openjdk-r/ppa
+    state: present
+
+# tasks file for ./roles/kafka
+- name: Install OpenJDK 8
+  apt:
+    name: openjdk-8-jdk, ufw
+
+- name: Allow common ports and enable firewall
+  ufw:
+    rule: allow
+    port: '{{ item }}'
+    proto: tcp
+  loop:
+    - ssh
