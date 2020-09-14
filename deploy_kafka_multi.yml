@@ -8,5 +8,21 @@
         update_cache: yes
         cache_valid_time: 3600
   roles:
+    - local-test
     - common
     - kafka
+  post_tasks:
+    - name: Run Zookeeper
+      shell: 
+        cmd: sudo service zookeeper start
+      register: zookeeper_answer
+
+    - debug: msg="{{ zookeeper_answer }}"
+
+    - name: Run Kafka
+      shell: 
+        cmd: sudo service kafka start
+      register: kafka_answer
+
+    - debug: msg="{{ kafka_answer }}"
+  

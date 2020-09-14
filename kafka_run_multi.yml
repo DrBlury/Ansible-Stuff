@@ -4,7 +4,7 @@
   tasks:
     - name: Run Kafka
       shell: 
-        cmd: bash /opt/kafka/bin/kafka-server-start.sh -daemon /opt/kafka/config/server.properties
+        cmd: sudo service kafka start
       register: kafka_answer
 
     - debug: msg="{{ kafka_answer }}"

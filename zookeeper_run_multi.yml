@@ -1,10 +1,10 @@
-- name: Run Kafka
+- name: Run Zookeeper
   hosts: all
   become: true
   tasks:
     - name: Run Zookeeper
       shell: 
-        cmd: bash /opt/kafka/bin/zookeeper-server-start.sh -daemon /opt/kafka/config/zookeeper.properties
+        cmd: sudo service zookeeper start
       register: zookeeper_answer
 
     - debug: msg="{{ zookeeper_answer }}"

@@ -8,12 +8,5 @@
 # tasks file for ./roles/kafka
 - name: Install OpenJDK 8
   apt:
-    name: openjdk-8-jdk, ufw
+    name: openjdk-8-jdk, unzip
 
-- name: Allow common ports and enable firewall
-  ufw:
-    rule: allow
-    port: '{{ item }}'
-    proto: tcp
-  loop:
-    - ssh

@@ -39,34 +39,22 @@
 - name: Copy Zookeeper myid file
   shell: echo "{{zookeeper_broker_id}}" > /var/lib/zookeeper/myid
     
-- name: Open Zookeeper & SSH Ports
-  ufw:
-    rule: allow
-    port: '{{ item }}'
-    proto: tcp
-  loop:
-    - "{{ zookeeper_server_port }}"
-    - "{{ zookeeper_server_port_alternative }}"
-    - "{{ zookeeper_port }}"
-    - ssh
+- name: Copy zookeeper service file
+  template: 
+    src: templates/zookeeper
+    dest: /etc/init.d/zookeeper
+    mode: 755
 
-- name: Enable UFW
-  ufw:
-    state: enabled
-    policy: allow
-
-- name: Copy hosts file
-  copy:
-    src: files/hosts
-    dest: /etc/hosts
-
-- name: Copy init.d file
-  copy:
-    src: files/kafka_zookeeper_init.d
+- name: Copy kafka service file
+  template: 
+    src: templates/kafka
     dest: /etc/init.d/kafka
     mode: 755
 
-- name: Create Kafka & Zookeeper Service
+- name: Create Zookeeper Service
+  shell: update-rc.d zookeeper defaults
+
+- name: Create Kafka Service
   shell: update-rc.d kafka defaults
   
 - name: Give configuration finish message
