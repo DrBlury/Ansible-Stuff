@@ -1,9 +1,19 @@
 #!/bin/bash
 #/etc/init.d/kafka
+### BEGIN INIT INFO
+# Provides:          kafka
+# Required-Start:    $all
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: Starts Kafka Broker
+### END INIT INFO
+
 DAEMON_PATH=/opt/kafka/bin
 DAEMON_NAME=kafka
 # Check that networking is up.
 #[ ${NETWORKING} = "no" ] && exit 0
+
 
 PATH=$PATH:$DAEMON_PATH
 

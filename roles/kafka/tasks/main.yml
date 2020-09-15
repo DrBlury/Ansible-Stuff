@@ -28,11 +28,13 @@
   template: 
     src: templates/zookeeper.properties
     dest: "{{ kafka_destination_download }}/{{ kafka_version }}/config/zookeeper.properties"
+  notify: restart_zookeeper
 
 - name: Copy Kafka config
   template: 
     src: templates/server.properties
     dest: "{{ kafka_destination_download }}/{{ kafka_version }}/config/server.properties"
+  notify: restart_kafka
 
 - name: Create target directory Zookeeper
   file: 
@@ -46,7 +48,7 @@
 
 - name: Copy Zookeeper myid file
   shell: echo "{{ zookeeper_broker_id }}" > /var/lib/zookeeper/myid
-    
+
 - name: Copy zookeeper service file
   template: 
     src: templates/zookeeper
@@ -65,6 +67,16 @@
 - name: Create Kafka Service
   shell: update-rc.d kafka defaults
 
+- name: Enable Zookeeper Service
+  service:
+    name: zookeeper
+    enabled: true
+
+- name: Enable Kafka Service
+  service:
+    name: kafka
+    enabled: true
+
 - name: Disable VM Swappines
   sysctl:
     name: vm.swappiness
@@ -74,19 +86,3 @@
 - name: Setting Kafka/Java Heap options
   shell:
     cmd: export KAFKA_HEAP_OPTS="{{ kafka_heap_opts }}"
-
-- name: Run Zookeeper
-  service:
-    name: zookeeper
-    state: restarted
-  register: zookeeper_answer
-
-- debug: msg="{{ zookeeper_answer }}"
-
-- name: Run Kafka
-  service:
-    name: kafka
-    state: restarted
-  register: kafka_answer
-
-- debug: msg="{{ kafka_answer }}"

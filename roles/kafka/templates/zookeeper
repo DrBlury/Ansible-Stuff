@@ -1,9 +1,14 @@
 #!/bin/sh
-#
 # zookeeper          Start/Stop zookeeper
-#
 # chkconfig: - 99 10
-# description: Standard script to start and stop zookeeper
+### BEGIN INIT INFO
+# Provides:          zookeeper
+# Required-Start:    $all
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: Starts Zookeeper Broker
+### END INIT INFO
 
 DAEMON_PATH=/opt/kafka/bin
 DAEMON_NAME=zookeeper
