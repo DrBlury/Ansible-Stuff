@@ -8,3 +8,6 @@ kafka_port: 9092
 zookeeper_port: 2181
 zookeeper_server_port: 2888
 zookeeper_server_port_alternative: 3888
+kafka_heap_opts: -Xmx2G -Xms2G
+kafka_log_dirs: /var/lib/kafka
+zookeeper_log_dirs: /var/lib/zookeeper

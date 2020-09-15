@@ -3,6 +3,7 @@
 - name: Install unzip
   apt:
     name: unzip
+    state: present
 
 - name: Create Kafka folder
   file:
@@ -33,11 +34,18 @@
     src: templates/server.properties
     dest: "{{ kafka_destination_download }}/{{ kafka_version }}/config/server.properties"
 
-- name: Create target directory
-  file: path=/var/lib/zookeeper/ state=directory
+- name: Create target directory Zookeeper
+  file: 
+    path: "{{ zookeeper_log_dirs }}"
+    state: directory
+
+- name: Create target directory Kafka
+  file: 
+    path: "{{ kafka_log_dirs }}"
+    state: directory
 
 - name: Copy Zookeeper myid file
-  shell: echo "{{zookeeper_broker_id}}" > /var/lib/zookeeper/myid
+  shell: echo "{{ zookeeper_broker_id }}" > /var/lib/zookeeper/myid
     
 - name: Copy zookeeper service file
   template: 
@@ -56,12 +64,29 @@
 
 - name: Create Kafka Service
   shell: update-rc.d kafka defaults
-  
-- name: Give configuration finish message
-  shell: 
-    cmd: echo "Successfully downloaded and configured Kafka & Zookeeper!"
-  register: finish_message
 
-- debug: msg="{{ finish_message.stdout }}"
+- name: Disable VM Swappines
+  sysctl:
+    name: vm.swappiness
+    value: '0'
+    state: present
 
+- name: Setting Kafka/Java Heap options
+  shell:
+    cmd: export KAFKA_HEAP_OPTS="{{ kafka_heap_opts }}"
 
+- name: Run Zookeeper
+  service:
+    name: zookeeper
+    state: restarted
+  register: zookeeper_answer
+
+- debug: msg="{{ zookeeper_answer }}"
+
+- name: Run Kafka
+  service:
+    name: kafka
+    state: restarted
+  register: kafka_answer
+
+- debug: msg="{{ kafka_answer }}"
