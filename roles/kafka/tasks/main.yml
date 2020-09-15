@@ -54,12 +54,14 @@
     src: templates/zookeeper
     dest: /etc/init.d/zookeeper
     mode: 755
+  notify: restart_kafka
 
 - name: Copy kafka service file
   template: 
     src: templates/kafka
     dest: /etc/init.d/kafka
     mode: 755
+  notify: restart_kafka
 
 - name: Create Zookeeper Service
   shell: update-rc.d zookeeper defaults

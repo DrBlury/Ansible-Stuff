@@ -27,7 +27,7 @@ case "$1" in
             echo "Kafka is already running"
         else
           echo "Starting $DAEMON_NAME"
-          $DAEMON_PATH/kafka-server-start.sh -daemon /opt/kafka/config/server.properties
+          sudo $DAEMON_PATH/kafka-server-start.sh -daemon /opt/kafka/config/server.properties
         fi
         ;;
   stop)
