@@ -7,3 +7,18 @@
     proto: tcp
   loop:
     - "{{ vault_ui_port }}"
+
+- name: Create vault folder
+  file:
+    path: /home/pi/vault/
+    state: directory
+
+- name: Copy docker compose file
+  template: 
+    src: templates/docker-compose.yml
+    dest: "/home/pi/vault/docker-compose.yml"
+
+- name: Start vault via docker-compose
+  shell:
+    cmd: docker-compose up -d
+    chdir: /home/pi/vault/

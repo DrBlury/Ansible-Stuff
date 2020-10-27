@@ -1,0 +1,22 @@
+version: '3.6'
+services:
+  kafka_manager:
+    image: hlebalbau/kafka-manager:stable
+    restart: "no"
+    networks:
+      traefik:
+    ports:
+      - "{{ ui_port }}:{{ ui_port }}"
+    environment:
+      ZK_HOSTS: "{{ zookeeper_connections }}"
+      APPLICATION_SECRET: "{{ application_secret }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.kafka-manager.rule: 'Host("cmak.homenet.com")'
+      traefik.http.services.kafka-manager.loadbalancer.server.port: "9000"
+      traefik.docker.network: traefik
+
+networks:
+  traefik:
+    external:
+      name: traefik_webgateway

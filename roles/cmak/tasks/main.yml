@@ -1,0 +1,16 @@
+---
+# tasks file for ./roles/cmak
+- name: Create Kafka folder
+  file:
+    path: /home/vagrant/cmak/
+    state: directory
+
+- name: Copy docker compose file
+  template: 
+    src: templates/docker-compose.yml
+    dest: "/home/vagrant/cmak/docker-compose.yml"
+
+- name: Start CMAK via docker-compose
+  shell:
+    cmd: docker-compose up -d
+    chdir: /home/vagrant/cmak

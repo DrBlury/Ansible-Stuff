@@ -1,0 +1,16 @@
+---
+# tasks file for ./roles/cmak
+- name: Create kafdrop folder
+  file:
+    path: /home/vagrant/kafdrop/
+    state: directory
+
+- name: Copy docker compose file
+  template: 
+    src: templates/docker-compose.yml
+    dest: "/home/vagrant/kafdrop/docker-compose.yml"
+
+- name: Start kafdrop via docker-compose
+  shell:
+    cmd: docker-compose up -d
+    chdir: /home/vagrant/kafdrop

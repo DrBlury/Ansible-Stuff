@@ -1,0 +1,16 @@
+---
+- name: Install traefik
+  hosts: traefik
+  become: true
+  vars:
+    pip_install_packages:
+      - name: docker
+      - name: docker-compose
+  pre_tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+  roles:
+    - local-test
+    - traefik

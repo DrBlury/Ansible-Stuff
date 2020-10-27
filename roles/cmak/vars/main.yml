@@ -1,0 +1,4 @@
+---
+# vars file for ./roles/cmak
+ui_port: 9001
+application_secret: random-secret

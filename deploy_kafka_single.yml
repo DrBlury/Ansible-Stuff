@@ -1,6 +1,6 @@
 ---
 - name: Install Zookeeper and Kafka
-  hosts: kafka
+  hosts: LenovoIdeapadC340
   become: true
   pre_tasks:
     - name: Update apt cache
@@ -9,5 +9,5 @@
         cache_valid_time: 3600
   roles:
     - common
-    - kafka-cluster
+    - kafka-single
   

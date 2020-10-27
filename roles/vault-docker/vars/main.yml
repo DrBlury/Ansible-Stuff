@@ -1,2 +1,2 @@
-vault_ui_port: 8200
+vault_ui_port: '8200'
 vault_ui_enabled: true

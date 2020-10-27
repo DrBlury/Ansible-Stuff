@@ -1,13 +1,11 @@
 ---
-- name: Install Zookeeper and Kafka
-  hosts: kafka
+- name: Install gitlab with web ui
+  hosts: raspberry2
   become: true
   pre_tasks:
     - name: Update apt cache
-      apt: 
+      apt:
         update_cache: yes
         cache_valid_time: 3600
   roles:
-    - common
-    - kafka-cluster
-  
+    - gitlab

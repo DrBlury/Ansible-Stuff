@@ -1,0 +1,39 @@
+---
+version: '3'
+
+services:
+  vault:
+    image: vault:latest
+    networks:
+      traefik:
+      vault:
+    ports:
+      - 8200:8200
+    volumes:
+      - vault-config:/vault/config
+      - vault-policies:/vault/policies
+      - vault-data:/vault/data
+    environment:
+      - VAULT_ADDR=http://0.0.0.0:8200
+      - VAULT_API_ADDR=http://0.0.0.0:8200
+      - VAULT_ADDRESS=http://0.0.0.0:8200
+      - VAULT_LOCAL_CONFIG={"ui":"{{ vault_ui_enabled }}","disable_mlock":"true","listener":{"tcp":{"address":"0.0.0.0:8200","tls_disable":"true"}},"backend":{"file":{"path":"/vault/file"}},"default_lease_ttl":"168h","max_lease_ttl":"0h","api_addr":"http://0.0.0.0/"}
+    cap_add:
+      - IPC_LOCK
+    command: server
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.vault.rule: 'Host("vault.home.net")'
+      traefik.http.services.vault.loadbalancer.server.port: "8200"
+      traefik.docker.network: traefik
+
+volumes:
+  vault-config:
+  vault-policies:
+  vault-data:
+
+networks:
+  vault:
+  traefik:
+    external:
+      name: traefik_webgateway
