@@ -1,6 +1,6 @@
 ---
 # vars file for ./roles/kafka
-kafka_dl_link: http://apache.lauf-forum.at/kafka/2.6.0/kafka_2.13-2.6.0.tgz
+kafka_dl_link: https://downloads.apache.org/kafka/2.8.0/kafka_2.13-2.8.0.tgz
 kafka_destination_download: /opt
 kafka_destination_final: /opt/kafka
 kafka_version: kafka_2.13-2.6.0

@@ -1,10 +1,11 @@
 all:
   hosts:
-    vagrant1:
-      ansible_host: 127.0.0.1
-      ansible_port: 2222
+    kafkaserver:
+      ansible_host: 192.168.1.13
+      ansible_user: kafka
+      ansible_port: 22
       kafka_broker_id: 1
-      zookeeper_connections: "localhost:2181, 10.0.0.12:2181, 10.0.0.13:2181"
+      zookeeper_connections: "192.168.1.13:2181"
       zookeeper_broker_id: 1
     vagrant2:
       ansible_host: 127.0.0.1

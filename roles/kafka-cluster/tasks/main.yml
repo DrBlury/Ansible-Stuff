@@ -8,7 +8,7 @@
 - name: Create Kafka User
   user:
     name: kafka
-    group: kafka
+    groups: kafka
     shell: /bin/bash
     append: yes
 
@@ -51,6 +51,11 @@
     group: kafka
     state: link
 
+- name: Copy log4j.properties
+  template: 
+    src: templates/log4j.properties
+    dest: "{{ kafka_destination_download }}/{{ kafka_version }}/config/log4j.properties"
+  notify: restart_kafka
 
 - name: Copy Zookeeper config
   template: 
