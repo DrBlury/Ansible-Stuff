@@ -1,6 +1,6 @@
 ---
 - name: Install Zookeeper and Kafka
-  hosts: kafkaserver
+  hosts: kafkasingle
   become: true
   pre_tasks:
     - name: Update apt cache
@@ -8,5 +8,5 @@
         update_cache: yes
         cache_valid_time: 3600
   roles:
+    - common
     - kafka-single
-  
