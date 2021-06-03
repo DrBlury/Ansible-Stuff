@@ -1,9 +1,37 @@
 ---
 # tasks file for ./roles/kafka
+- name: Ensure group "kafka" exists
+  group:
+    name: kafka
+    state: present
+
+- name: Create Kafka User
+  user:
+    name: kafka
+    groups: kafka
+    shell: /bin/bash
+    append: yes
+
+- name: Add Ansible user to Kafka group
+  user:
+    name: ovb-ansible
+    groups: kafka
+    append: yes
+
 - name: Install unzip
   apt:
     name: unzip
     state: present
+
+- name: Disable VM Swappines
+  sysctl:
+    name: vm.swappiness
+    value: '0'
+    state: present
+
+- name: Setting Kafka/Java Heap options
+  shell:
+    cmd: export KAFKA_HEAP_OPTS="{{ kafka_heap_opts }}"
 
 - name: Create Kafka folder
   file:
@@ -18,11 +46,26 @@
     dest: "{{ kafka_destination_download }}"
     creates: "{{ kafka_destination_download }}/{{ kafka_version }}/"
 
+- name: Change owner of kafka directory
+  file:
+    path: "{{ kafka_destination_download }}/{{ kafka_version }}"
+    owner: kafka
+    group: kafka
+    recurse: yes
+
 - name: Create link for Kafka folder
   file:
     src: "{{ kafka_destination_download }}/{{ kafka_version }}"
     dest: "{{ kafka_destination_final }}"
+    owner: kafka
+    group: kafka
     state: link
+
+- name: Copy log4j.properties
+  template: 
+    src: templates/log4j.properties
+    dest: "{{ kafka_destination_download }}/{{ kafka_version }}/config/log4j.properties"
+  notify: restart_kafka
 
 - name: Copy Zookeeper config
   template: 
@@ -40,51 +83,43 @@
   file: 
     path: "{{ zookeeper_log_dirs }}"
     state: directory
+    owner: kafka
+    group: kafka
+    recurse: yes
 
 - name: Create target directory Kafka
   file: 
     path: "{{ kafka_log_dirs }}"
     state: directory
+    owner: kafka
+    group: kafka
+    recurse: yes
 
 - name: Copy Zookeeper myid file
-  shell: echo "1" > /var/lib/zookeeper/myid
+  shell: echo "{{ zookeeper_broker_id }}" > /var/lib/zookeeper/myid
 
 - name: Copy zookeeper service file
   template: 
-    src: templates/zookeeper
-    dest: /etc/init.d/zookeeper
+    src: templates/kafka-zookeeper.service
+    dest: /etc/systemd/system/kafka-zookeeper.service
     mode: 755
-  notify: restart_kafka
+  notify: restart_zookeeper
 
 - name: Copy kafka service file
   template: 
-    src: templates/kafka
-    dest: /etc/init.d/kafka
+    src: templates/kafka.service
+    dest: /etc/systemd/system/kafka.service
     mode: 755
   notify: restart_kafka
 
-- name: Create Zookeeper Service
-  shell: update-rc.d zookeeper defaults
-
-- name: Create Kafka Service
-  shell: update-rc.d kafka defaults
-
-- name: Enable Zookeeper Service
+- name: Enable kafka-zookeeper service
   service:
-    name: zookeeper
-    enabled: true
+    name: kafka-zookeeper
+    enabled: yes
+    state: started
 
-- name: Enable Kafka Service
+- name: Enable kafka service
   service:
     name: kafka
-    enabled: true
-
-- name: Disable VM Swappines
-  sysctl:
-    name: vm.swappiness
-    value: '0'
-    state: present
-
-- name: Setting Kafka/Java Heap options
-  shell:
-    cmd: export KAFKA_HEAP_OPTS="{{ kafka_heap_opts }}"
+    enabled: yes
+    state: started
