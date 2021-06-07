@@ -3,7 +3,7 @@
     service:
       name: kafka-zookeeper
       state: restarted
-  
+
   - name: restart_kafka
     service:
       name: kafka

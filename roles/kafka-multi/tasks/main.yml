@@ -12,12 +12,6 @@
     shell: /bin/bash
     append: yes
 
-- name: Add Ansible user to Kafka group
-  user:
-    name: ovb-ansible
-    groups: kafka
-    append: yes
-
 - name: Install unzip
   apt:
     name: unzip
@@ -96,7 +90,7 @@
     recurse: yes
 
 - name: Copy Zookeeper myid file
-  shell: echo "{{ zookeeper_broker_id }}" > /var/lib/zookeeper/myid
+  shell: echo "{{ broker_id }}" > /var/lib/zookeeper/myid
 
 - name: Copy zookeeper service file
   template: 

@@ -90,7 +90,7 @@
     recurse: yes
 
 - name: Create Zookeeper myid file
-  shell: echo "{{ zookeeper_broker_id }}" > /var/lib/zookeeper/myid
+  shell: echo "{{ broker_id }}" > /var/lib/zookeeper/myid
 
 - name: Copy zookeeper service file
   template: 

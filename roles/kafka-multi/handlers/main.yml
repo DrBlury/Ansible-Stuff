@@ -1,7 +1,7 @@
 ---
   - name: restart_zookeeper
     service:
-      name: zookeeper
+      name: kafka-zookeeper
       state: restarted
   
   - name: restart_kafka

@@ -1,6 +1,6 @@
 ---
 - name: Install Zookeeper and Kafka
-  hosts: kafkasingle
+  hosts: kafkaserver
   become: true
   pre_tasks:
     - name: Update apt cache
