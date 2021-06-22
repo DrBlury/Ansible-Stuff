@@ -1,0 +1,14 @@
+[Unit]
+Description=The Service that runs a PaperMC Server
+Requires=network.target remote-fs.target
+After=network.target remote-fs.target
+
+[Service]
+Type=simple
+User=papermc
+Group=papermc
+RootDirectory=/home/papermc/server
+ExecStart=/usr/bin/java -Xms1G -Xmx1G -jar paper-1.17-32.jar --nogui
+
+[Install]
+WantedBy=multi-user.target

@@ -1,5 +1,9 @@
 all:
   hosts:
+    minecraft_server:
+      ansible_host: 192.168.1.134
+      ansible_user: drblury
+      ansible_port: 22
     kafkaserver:
       ansible_host: hostnameOrIPAddress
       ansible_user: username

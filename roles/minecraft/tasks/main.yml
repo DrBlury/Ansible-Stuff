@@ -1,0 +1,66 @@
+---
+# tasks file for ./roles/minecraft
+- name: Add OpenJDK Repository for apt
+  apt_repository:
+    repo: ppa:openjdk-r/ppa
+    state: present
+
+- name: Install OpenJDK 16
+  apt:
+    name: openjdk-16-jdk
+
+- name: Ensure group "papermc" exists
+  ansible.builtin.group:
+    name: papermc
+    state: present
+
+- name: Add the user 'papermc' with a specific uid and a primary group of 'admin'
+  ansible.builtin.user:
+    name: papermc
+    group: papermc
+    shell: /bin/bash
+    state: present
+
+- name: Create papermc folder
+  ansible.builtin.file:
+    path: /home/papermc/server
+    state: directory
+    owner: papermc
+    group: papermc
+    mode: "660"
+
+- name: Download PaperMC jar file
+  get_url:
+    url: https://papermc.io/api/v2/projects/paper/versions/1.17/builds/32/downloads/paper-1.17-32.jar
+    dest: /home/papermc/server/
+    owner: papermc
+    group: papermc
+    mode: "777"
+
+- name: Copy eula.txt file
+  template: 
+    src: templates/eula.txt
+    dest: /home/papermc/server/
+    owner: papermc
+    group: papermc
+    mode: "644"
+
+- name: Copy server.properties file
+  template:
+    src: templates/server.properties
+    dest: /home/papermc/server/
+    owner: papermc
+    group: papermc
+    mode: "644"
+
+- name: Copy minecraft-server service file
+  template: 
+    src: templates/minecraft-server.service
+    dest: /etc/systemd/system/minecraft-server.service
+    mode: "775"
+
+- name: Enable minecraft-server service
+  service:
+    name: minecraft-server
+    enabled: yes
+    state: started
