@@ -1,5 +1,0 @@
----
-# vars file for ./roles/cmak
-ui_port: 9000
-application_secret: random-secret
-kafka_broker: 10.0.0.13:9092
