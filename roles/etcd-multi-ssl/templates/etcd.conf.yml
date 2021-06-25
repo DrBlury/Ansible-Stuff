@@ -23,10 +23,10 @@ election-timeout: 1000
 quota-backend-bytes: 0
 
 # List of comma separated URLs to listen on for peer traffic.
-listen-peer-urls: 'https://{{ host_ip }}:2380'
+listen-peer-urls: 'https://{{ ansible_host }}:2380'
 
 # List of comma separated URLs to listen on for client traffic.
-listen-client-urls: 'https://{{ host_ip }}:2379,https://127.0.0.1:2379'
+listen-client-urls: 'https://{{ ansible_host }}:2379,https://127.0.0.1:2379'
 
 # Maximum number of snapshot files to retain (0 is unlimited).
 max-snapshots: 5
@@ -39,11 +39,11 @@ cors:
 
 # List of this member's peer URLs to advertise to the rest of the cluster.
 # The URLs needed to be a comma-separated list.
-initial-advertise-peer-urls: https://{{ host_ip }}:2380
+initial-advertise-peer-urls: https://{{ ansible_host }}:2380
 
 # List of this member's client URLs to advertise to the public.
 # The URLs needed to be a comma-separated list.
-advertise-client-urls: https://{{ host_ip }}:2379
+advertise-client-urls: https://{{ ansible_host }}:2379
 
 # Discovery URL used to bootstrap the cluster.
 discovery:
@@ -61,7 +61,7 @@ discovery-srv:
 initial-cluster: '{{ nodes[0].hostname }}=https://{{ nodes[0].ip }}:2380,{{ nodes[1].hostname }}=https://{{ nodes[1].ip }}:2380,{{ nodes[2].hostname }}=https://{{ nodes[2].ip }}:2380'
 
 # Initial cluster token for the etcd cluster during bootstrap.
-initial-cluster-token: 'etcd-cluster2'
+initial-cluster-token: '{{ etcd_token }}'
 
 # Initial cluster state ('new' or 'existing').
 initial-cluster-state: 'new'
