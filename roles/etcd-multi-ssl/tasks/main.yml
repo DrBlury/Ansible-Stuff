@@ -20,27 +20,38 @@
     - {url: 'https://github.com/cloudflare/cfssl/releases/download/v1.6.0/cfssl-certinfo_1.6.0_linux_amd64', dest: '/usr/local/bin/cfssl-certinfo'}
   when: is_certificate_auth == true
 
-- name: Create certs directory
+- name: Create certs tmp directory
   file:
-    path: "/certs"
+    path: "/tmp/certs"
     state: directory
 
-- name: Copy ca-config.json
+- name: Create certs final directory
+  file:
+    path: "./certs"
+    state: directory
+
+- name: Copy etcd-root-ca-csr.json
   template: 
-    src: templates/ca-config.json
-    dest: "/certs/ca-config.json"
+    src: templates/etcd-root-ca-csr.json
+    dest: "/tmp/certs/etcd-root-ca-csr.json"
   when: is_certificate_auth == true
 
-- name: Copy ca-csr.json
+- name: Copy etcd-gencert.json
   template: 
-    src: templates/ca-csr.json
-    dest: "/certs/ca-csr.json"
+    src: templates/etcd-gencert.json
+    dest: "/tmp/certs/etcd-gencert.json"
+  when: is_certificate_auth == true
+
+- name: Generate ca cert
+  shell:
+    chdir: "/certs/"
+    cmd: "cfssl gencert --initca=true /tmp/certs/etcd-root-ca-csr.json | cfssljson --bare /tmp/certs/etcd-root-ca"
   when: is_certificate_auth == true
 
 - name: Copy etcd-csr.json
   template: 
     src: templates/etcd-csr.json
-    dest: "/certs/etcd-csr.json"
+    dest: "/tmp/certs/etcd-csr.json"
   when: is_certificate_auth == true
 
 - name: export cert hostnames
@@ -48,16 +59,10 @@
     cmd: "export CERT_HOSTNAME=192.168.1.126,192.168.1.127,192.168.1.128"
   when: is_certificate_auth == true
 
-- name: Generate ca cert
-  shell:
-    chdir: "/certs/"
-    cmd: "cfssl gencert -initca ca-csr.json | cfssljson -bare ca"
-  when: is_certificate_auth == true
-
 - name: Generate etcd cert
   shell:
     chdir: "/certs/"
-    cmd: "cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=${CERT_HOSTNAME} -profile=etcd etcd-csr.json | cfssljson -bare etcd"
+    cmd: "cfssl gencert -ca=/tmp/certs/etcd-root-ca.pem -ca-key=/tmp/certs/etcd-root-ca-key.pem -config=/tmp/certs/etcd-gencert.json -hostname=${CERT_HOSTNAME} etcd-csr.json | cfssljson -bare /tmp/certs/etcd"
   when: is_certificate_auth == true
 
 - name: Copy certs from CA authority to Ansible host
@@ -65,9 +70,10 @@
     dest: '{{ item.dest }}'
     src: '{{ item.src }}'
   loop:
-    - {src: '/certs/ca.pem', dest: './certs/'}
-    - {src: '/certs/etcd.pem', dest: './certs/'}
-    - {src: '/certs/etcd-key.pem', dest: './certs/'}
+    - {src: '/tmp/certs/etcd-root-ca.pem', dest: './certs/'}
+    - {src: '/tmp/certs/etcd.pem', dest: './certs/'}
+    - {src: '/tmp/certs/etcd-key.pem', dest: './certs/'}
+    - {src: '/tmp/certs/etcd-root-ca-key.pem', dest: './certs/'}
   when: is_certificate_auth == true
 
 - name: Create etcd dirs
@@ -78,20 +84,26 @@
     - '/etc/etcd'
     - '/var/lib/etcd'
 
+- name: Set dir properties for etcd
+  file:
+    path: '/var/lib/etcd'
+    mode: '0700'
+
 - name: Copy Certs from Ansible host to nodes
   copy:
     src: '{{ item.src }}'
     dest: '{{ item.dest}}'
   loop:
-    - {src: './certs/k3s-1/certs/ca.pem', dest: '/etc/etcd/'}
-    - {src: './certs/k3s-1/certs/etcd-key.pem', dest: '/etc/etcd/'}
-    - {src: './certs/k3s-1/certs/etcd.pem', dest: '/etc/etcd/'}
+    - {src: './certs/k3s-1/tmp/certs/etcd-root-ca.pem', dest: '/etc/etcd/'}
+    - {src: './certs/k3s-1/tmp/certs/etcd-root-ca-key.pem', dest: '/etc/etcd/'}
+    - {src: './certs/k3s-1/tmp/certs/etcd.pem', dest: '/etc/etcd/'}
+    - {src: './certs/k3s-1/tmp/certs/etcd-key.pem', dest: '/etc/etcd/'}
 
 - name: Download etcd
   unarchive:
     remote_src: yes
     validate_certs: false
-    src: 'https://github.com/etcd-io/etcd/releases/download/v3.4.16/{{ etcd_version_name }}.tar.gz'
+    src: 'https://github.com/etcd-io/etcd/releases/download/v3.5.0/{{ etcd_version_name }}.tar.gz'
     dest: "/certs/"
     mode: "0755"
 
@@ -104,17 +116,22 @@
   loop:
     - {src: '/certs/{{ etcd_version_name }}/etcd', dest: '/usr/local/bin/'}
     - {src: '/certs/{{ etcd_version_name }}/etcdctl', dest: '/usr/local/bin/'}
-    ###- {src: '/certs/{{ etcd_version_name }}/etcdutl', dest: '/usr/local/bin/'}
+    - {src: '/certs/{{ etcd_version_name }}/etcdutl', dest: '/usr/local/bin/'}
 
 - name: Copy etcd service file
   template: 
     src: 'templates/etcd.service'
     dest: '/etc/systemd/system/etcd.service'
 
-- name: Reload systemd
+- name: Copy etcd config
+  template: 
+    src: templates/etcd.conf.yml
+    dest: "/etc/etcd/etcd.conf"
+
+- name: Reload systemd and start etcd
   service:
     daemon_reload: true
     name: etcd
     enabled: true
-    state: started
+    state: restarted
   

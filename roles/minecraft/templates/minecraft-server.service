@@ -8,7 +8,7 @@ Type=simple
 User=papermc
 Group=papermc
 RootDirectory=/home/papermc/server
-ExecStart=/usr/bin/java -Xms1G -Xmx1G -jar paper-1.17-32.jar --nogui
+ExecStart=/usr/bin/java -Xms1G -Xmx1G -jar /home/papermc/server/paper-1.17-32.jar --nogui
 
 [Install]
 WantedBy=multi-user.target

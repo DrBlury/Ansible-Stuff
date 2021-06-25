@@ -1,0 +1,17 @@
+---
+- name: Install etcd HA and k3s HA
+  hosts: k3s-cluster
+  vars:
+    nodes:
+        - {ip: 192.168.1.126, hostname: k3s-1.linuxcode.net}
+        - {ip: 192.168.1.127, hostname: k3s-2.linuxcode.net}
+        - {ip: 192.168.1.128, hostname: k3s-3.linuxcode.net}
+  become: true
+  pre_tasks:
+    - name: Update apt cache
+      apt: 
+        update_cache: yes
+        cache_valid_time: 3600
+  roles:
+    - etcd-multi-ssl
+  

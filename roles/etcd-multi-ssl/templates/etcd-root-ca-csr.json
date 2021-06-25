@@ -1,0 +1,16 @@
+{
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "O": "etcd",
+      "OU": "etcd Security",
+      "L": "Cologne",
+      "ST": "NRW",
+      "C": "Germany"
+    }
+  ],
+  "CN": "etcd-root-ca"
+}
