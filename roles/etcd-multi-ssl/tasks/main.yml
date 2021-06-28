@@ -54,11 +54,6 @@
     dest: "/tmp/certs/etcd-csr.json"
   when: is_certificate_auth == true
 
-- name: export cert hostnames
-  shell:
-    cmd: "export CERT_HOSTNAME=192.168.1.126,192.168.1.127,192.168.1.128"
-  when: is_certificate_auth == true
-
 - name: Generate etcd cert
   shell:
     chdir: "/certs/"

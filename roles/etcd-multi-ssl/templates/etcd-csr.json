@@ -3,7 +3,10 @@
   "hosts": [
     "{{ nodes[0].ip }}",
     "{{ nodes[1].ip }}",
-    "{{ nodes[2].ip }}"
+    "{{ nodes[2].ip }}",
+    "{{ nodes[0].hostname }}",
+    "{{ nodes[1].hostname }}",
+    "{{ nodes[2].hostname }}"
   ],
   "key": {
     "algo": "rsa",
